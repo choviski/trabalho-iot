@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .thermometer {
+      position: relative;
+      width: 80px;
+      height: 390px;
+      background-color: #ccc;
+      margin: 20px auto;
+      border-top-right-radius: 50px;
+      border-top-left-radius: 50px;
+    }
+
+    .mercury {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 180px;
+      background-color: #3490dc;
+      border-top-right-radius: 50px;
+      border-top-left-radius: 50px;
+      transition: height 0.5s, background-color 0.5s;
+    }
+
+    .bulb {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 138px;
+      height: 128px;
+      background-color: #ccc;
+      border-radius: 50%;
+    }
+
+    .bulb2 {
+      position: absolute;
+      left: 50%;
+      top: -5px;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 100px;
+      background-color: #3490dc;
+      border-radius: 50%;
+    }
+
+    .temperature {
+      text-align: center;
+      font-size: 24px;
+      margin-top: 10px;
+    }
+
+    .temperature-blue {
+      color: #3490dc;
+    }
+
+    .temperature-orange {
+      color: #e44d26;
+    }
+
+    .temperature-red {
+      color: #e3342f;
+    }
+
+    .unit-markers {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 2px;
+      height: 100%;
+      background-color: #000;
+      transform: translateX(-50%);
+    }
+
+    .unit-marker {
+      position: absolute;
+      width: 10px;
+      height: 2px;
+      background-color: #000;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  </style>
+  <title>Sistema Anti-incêndio da Aula</title>
+</head>
+
+<body class="bg-blue-200 p-5" id="fundo">
+  <div class="w-full flex justify-center">
+    <div class="md:w-8/12 sm:10/12 rounded-lg border border-blue-500 bg-white p-10">
+      <div id="titulo" class="w-full border-b flex justify-center md:text-3xl sm:text-xl">
+        Monitore a Temperatura da sua sala
+      </div>
+
+      <div class="p-4 text-xl text-gray-600" id="mqttData">
+        <div class="thermometer">
+          <div class="mercury" id="mercury"></div>
+          <div class="bulb">
+            <div class="bulb2" id="bulb2"></div>
+          </div>
+          <div class="ml-5 munit-markers">
+            <div class="unit-marker" style="top: 20%;"></div>
+            <div class="unit-marker" style="top: 40%;"></div>
+            <div class="unit-marker" style="top: 60%;"></div>
+          </div>
+        </div>
+        <div class="temperature" id="temperature">0°C</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+  <script>
+    const socket = io();
+
+    socket.on('mqttMessage', (message) => {
+      const mercury = document.getElementById('mercury');
+      const titulo = document.getElementById('titulo');
+      const bulb2 = document.getElementById('bulb2');
+      const temperatureDisplay = document.getElementById('temperature');
+      const fundo = document.getElementById('fundo');
+      const temperature = Number(message);
+
+      const maxTemperature = 60;
+      const minTemperature = 20;
+      const normalizedHeight = (temperature - minTemperature) / (maxTemperature - minTemperature) * 100;
+
+      mercury.style.height = `${normalizedHeight}%`;
+
+      if (temperature <= 35) {
+        mercury.style.backgroundColor = '#3490dc';
+        bulb2.style.backgroundColor = '#3490dc';
+        titulo.style.color = '#3490dc';
+        fundo.style.backgroundColor = '#3490dc';
+        temperatureDisplay.className = 'temperature temperature-blue';
+      } else if (temperature <= 40) {
+        mercury.style.backgroundColor = '#e44d26';
+        bulb2.style.backgroundColor = '#e44d26';
+        fundo.style.backgroundColor = '#e44d26';
+        titulo.style.color = '#e44d26';
+        temperatureDisplay.className = 'temperature temperature-orange';
+      } else {
+        mercury.style.backgroundColor = '#e3342f';
+        bulb2.style.backgroundColor = '#e3342f';
+        fundo.style.backgroundColor = '#e3342f';
+        titulo.style.color = '#e3342f';
+        temperatureDisplay.className = 'temperature temperature-red';
+      }
+
+      temperatureDisplay.textContent = `${temperature}°C`;
+    });
+  </script>
+</body>
+
+</html>
