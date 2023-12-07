@@ -14,7 +14,7 @@ Para instalar o cliente, digite:
 Após isso inicie o seu broker digitando:
 `mosquitto`
 
-## Abaixando o projeto Web
+## Baixando o projeto Web
 navegue até a pasta que deseje iniciar seu projeto e digite:
 `git clone "https://github.com/choviski/trabalho-iot.git"`
 
